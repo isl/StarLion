@@ -1,0 +1,1617 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--copied by libby - same at 2001-06-27
+
+Michael Arick
+
+2001-06-18
+
+This RDF Schema represents a hybrid of two RDF schema written by Michael Arick
+and Libby Miller.  These schema are intended to implement calendar/scheduling
+data (see iCalendar, calsh working group, IETF).
+
+-->
+<!--ENTITY iCalendar 
+'http://ilrt.org/discovery/2001/06/schemas/ical-full/hybrid.rdf#' -->
+<!--ENTITY xx 'http://www.w3.org/2001/XMLSchema#'-->
+
+<!DOCTYPE rdf:RDF [
+ 	 <!ENTITY rdf 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+	 <!ENTITY iCalendar ''>
+ 	 <!ENTITY rdfs 'http://www.w3.org/2000/01/rdf-schema#'>
+         <!ENTITY xmlsdt 'http://www.w3.org/2001/XMLSchema#'>
+         <!ENTITY dc 'http://purl.org/dc/elements/1.1/'>
+         <!ENTITY foaf 'http://xmlns.com/foaf/0.1/'> 
+ ]>
+
+
+<rdf:RDF xmlns:rdf="&rdf;"
+ 	 xmlns:iCalendar=""
+	 xmlns:rdfs="&rdfs;"
+         xmlns:dc="&dc;"
+
+>
+
+<rdf:Description rdf:about="" 
+      dc:creator="Michael Arick"
+      dc:contributor="Libby Miller" 
+      dc:title="Hybrid iCal-like RDF Schema"
+      dc:description="This RDF Schema represents a hybrid of two RDF schema 
+written by Michael Arick and Libby Miller.  These schema are intended to implement
+calendar/scheduling data (see iCalendar, calsh working group, IETF)."
+      dc:date="2001-06-17"/>
+
+
+<!--Simple Data Types-->
+<!-- The rdf:about="&iCalendar;.." was replaced by rdf:ID=".." -->
+
+<rdfs:Class rdf:ID="BINARY"
+ rdfs:label="binary"
+ rdfs:comment="Used to identify properties that contain a character encoding of inline binary data.">
+ <rdfs:subClassOf rdf:resource="&xmlsdt;base64binary"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="BOOLEAN"
+ rdfs:label="boolean"
+ rdfs:comment="A boolean data type. The iCalendar rfc 2445 defines it as a literal, either TRUE or FALSE (case insensitive) ">
+ <rdfs:subClassOf rdf:resource="&xmlsdt;boolean" />
+</rdfs:Class>
+
+
+<rdfs:Class
+ rdf:ID="CAL-ADDRESS"
+ rdfs:label="Calendar user address"
+ rdfs:comment="Used to identify properties that contain a calendar user
+address. When used to address an Internet email transport address for a
+calendar user, the value must be a MAILTO uri" >
+
+<!-- this should distinguish between a user and their address. It is used in
+RFC 2445 as a person or resource identifier. -->
+
+<rdfs:subClassOf rdf:resource="&xmlsdt;anyURL" />
+</rdfs:Class>
+
+<!-- TimeEntry is a superclass of DATE and DATE-TIME since many properties
+take either.-->
+
+<rdfs:Class 
+ rdf:ID="TimeEntry"
+ rdfs:label="TimeEntry"
+ rdfs:comment="Date or Date-Time"/>
+
+<rdfs:Class
+ rdf:ID="DATE"
+ rdfs:label="Date"
+ rdfs:comment=" A value type which is used to identify values that specify a
+ calendar date.">
+
+<!-- year (4 digits) month (2 digits) date (2 digits) 
+Is there a Daml/xsd date datatype? 
+The XML Schema datatypes includes this kind of date.
+-->
+<rdfs:subClassOf rdf:resource="&xmlsdt;date" />
+<rdfs:subClassOf rdf:resource="#TimeEntry"/>
+<rdfs:subClassOf rdf:resource="#TriggerEntry"/>
+</rdfs:Class>
+
+<!-- The class TriggerEntry has not been defined before. For this, it is
+typically defined -->
+<rdfs:Class rdf:ID="TriggerEntry"
+ rdfs:label="TriggerEntry"/>
+
+<rdfs:Class
+rdf:ID="DATE-TIME"
+ rdfs:label="Date-time"
+ rdfs:comment=" A value type which is used to identify values that specify a
+precise calendar date and time of day. ">
+
+<!-- I am unsure if this should be a property or a class; B-L regards it as
+a class. RFC 2445 has a specific syntax for writing it down though. The
+SKICal RDF notes and the RSS events have a string as a date. Note really
+feasible with timezones, etc though. Suggest we go with rdf:value, like the
+DC model in RDF.
+This value can of of three types: floating (no timezone), UTC (suffixed with
+a Z) or local time with timezone reference (needs a Timezone object
+asociated with it.)
+should DATE-TIME be a subclass of DATE? 
+- I think so (a specialization)
+XML Schema datatypes defines this as well:
+dateTime represents a specific instant of time. The ·value space· of dateTime is the space of Combinations of date and time of day values as defined in § 5.4 of [ISO 8601].
+-->
+<rdfs:subClassOf rdf:resource="&xmlsdt;dateTime" />
+<rdfs:subClassOf rdf:resource="#TimeEntry" />
+</rdfs:Class>
+
+
+<rdfs:Class
+rdf:ID="DURATION"
+ rdfs:label="duration of time"
+ rdfs:comment="a duration of time" >
+
+<!-- Again we have a specific syntax associated with this. 
+P then
+n D (days)
+n W (weeks)
+[no months or years]
+
+T then
+n H (hours)
+n M (minutes)
+n S (seconds)
+
+see also the DAML work on durations and instants
+NOTE: there is also an XMLSchema datatype for duration
+-->
+</rdfs:Class>
+
+
+
+<rdfs:Class
+rdf:ID="FLOAT"
+ rdfs:label="Float"
+ rdfs:comment="float data type" >
+<rdfs:subClassOf rdf:resource="&xmlsdt;float" />
+</rdfs:Class>
+
+
+<rdfs:Class
+rdf:ID="INTEGER"
+ rdfs:label="Integer"
+ rdfs:comment="a signed integer" >
+<rdfs:subClassOf rdf:resource="&xmlsdt;integer" />
+</rdfs:Class>
+
+<rdfs:Class
+rdf:ID="PERIOD"
+ rdfs:label="a period of time"
+ rdfs:comment="a precise period of time. Either a start DATE-TIME and an
+end DATE-TIME or a start DATE-TIME and a DURATION" >
+<!-- 
+I'm not sure how this would look
+-->
+</rdfs:Class>
+
+
+<rdfs:Class
+rdf:ID="RECUR"
+ rdfs:label="Recurrence rule"
+ rdfs:comment="A recurrence rule">
+
+<!--Recurrance is hard ;-) I've made a stab at it.
+
+see the properties
+#FREQ
+#COUNT
+#UNTIL
+#INTERVAL
+#BYSECOND
+#BYMINUTE
+#BYHOUR
+#BYMONTHDAY
+#BYYEARDAY
+#BYWEEKNO
+#BYMONTH
+#BYSETPOS
+#WKSET
+-->
+
+<!--MHA: I think these properties should subclass from RECUR-PROPERTY or some 
+such, so it is easy to distinguish these.  Furthermore, we could make RECUR 
+the domain of RECUR-PROPERTY. --> 
+
+</rdfs:Class>
+
+
+<rdfs:Class
+rdf:ID="TEXT"
+ rdfs:label="Text"
+ rdfs:comment="An object with an rdf:value of human-readable text">
+<rdfs:subClassOf rdf:resource="&xmlsdt;string"/>
+
+<!--
+
+I think this has to be the case unless rdf:literal is redefined as a
+subclass of rdf:resource, because iCalendar RFC 2445 attatches lots of
+properties to TEXT. But it might not be the simplest solution in the
+future.
+
+-->
+</rdfs:Class>
+
+
+<rdfs:Class
+rdf:ID="TIME"
+ rdfs:label="Time"
+ rdfs:comment="Time of day. Three forms are possible: hour, min, sec
+floating, UTC (suffixed by a Z character) and local time with Time zone
+reference.">
+<!-- ?? and... what is the relationship of DATE and TIME to DATE-TIME and
+to each other?-->
+<!--from xml schema datatypes time-->
+<rdfs:subClassOf rdf:resource="&xmlsdt;time" />
+</rdfs:Class>
+
+
+
+<rdfs:Class rdf:ID="URI"
+ rdfs:label="Uri"
+ rdfs:comment="A uri as defined by RFC 1738, RFC 2111 and any other IETF
+ registered value format" >
+ <!-- do we even need to subclass resource? -->
+ <!--MHA: URI is defined in XMLSchema#anyURI.  We can subClass that. 
+ -->
+
+ <rdfs:subClassOf rdf:resource="&xmlsdt;anyURI" />
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="UTC-OFFSET"
+ rdfs:label="UTC offset"
+ rdfs:comment="This appears to be a special kind of integer in the iCalendar
+ specification." >
+ <rdfs:subClassOf rdf:resource="#INTEGER"/>
+</rdfs:Class>
+
+<!--Components-->
+
+<rdfs:Class
+rdf:ID="VCALENDAR"
+ rdfs:label="Calendar"
+ rdfs:comment="A calendar of events"/>
+
+<rdfs:Class
+rdf:ID="REC-CAL-COMPONENT"
+ rdfs:label="Recurring calendar component"
+ rdfs:comment="A recurring calendar component. Only VEVENTs, VTODOs and
+VJOURNALs can recur" />
+
+<rdfs:Class
+rdf:ID="CAL-COMPONENT"
+ rdfs:label="Calendar component"
+ rdfs:comment="A superclass of all calendar components" />
+
+
+<rdfs:Class
+rdf:ID="VEVENT"
+ rdfs:label="Event"
+ rdfs:comment="An event">
+<rdfs:subClassOf rdf:resource="#CAL-COMPONENT"/>
+</rdfs:Class>
+
+<rdfs:Class
+rdf:ID="REC-VEVENT"
+ rdfs:label="Recurring Event"
+ rdfs:comment="A recurring event">
+ <rdfs:subClassOf rdf:resource="#VEVENT"/>
+ <rdfs:subClassOf rdf:resource="#REC-CAL-COMPONENT"/>
+</rdfs:Class>
+
+<rdfs:Class
+rdf:ID="ANNIVERSARY"
+ rdfs:label="Anniversary"
+ rdfs:comment="An event which may occur repeatedly">
+
+<!-- 
+
+I'm not completely sure about this one. If VEVENT is used in this way, it
+must have a DATE rather than a DATE-TIME for the DTSTART property. It seems
+rather confusing to overload the semantics of DATE-START in this way -
+sometimes means the start of a repeating event; sometimes of an actual
+event. Plus there is all the recurrance rules stuff as well.
+
+ -->
+<rdfs:subClassOf rdf:resource="#REC-VEVENT" />
+</rdfs:Class>
+
+
+
+<rdfs:Class rdf:ID="VTODO"
+ rdfs:label="Todo"
+ rdfs:comment="A todo object">
+<rdfs:subClassOf rdf:resource="#CAL-COMPONENT" />
+</rdfs:Class>
+
+
+<rdfs:Class
+ rdf:ID="REC-VTODO"
+ rdfs:label="Recurring TODO"
+ rdfs:comment="A recurring todo">
+ <rdfs:subClassOf rdf:resource="#VTODO" />
+ <rdfs:subClassOf rdf:resource="#REC-CAL-COMPONENT"/>
+</rdfs:Class>
+
+<rdfs:Class rdf:ID="VJOURNAL"
+ rdfs:label="Journal"
+ rdfs:comment="A journal object">
+ <rdfs:subClassOf rdf:resource="#CAL-COMPONENT" />
+</rdfs:Class>
+
+<rdfs:Class
+ rdf:ID="REC-VJOURNAL"
+ rdfs:label="Recurring Journal"
+ rdfs:comment="A recurring journal entry">
+ <rdfs:subClassOf rdf:resource="#VJOURNAL" />
+ <rdfs:subClassOf rdf:resource="#REC-CAL-COMPONENT" />
+</rdfs:Class>
+
+
+<rdfs:Class
+ rdf:ID="VFREEBUSY"
+ rdfs:label="Free-busy"
+ rdfs:comment="A free-busy object">
+<rdfs:subClassOf rdf:resource="#CAL-COMPONENT"/>
+</rdfs:Class>
+
+<rdfs:Class
+ rdf:ID="REC-VFREEBUSY"
+ rdfs:label="Recurring Free-busy"
+ rdfs:comment="A recurring free-busy object">
+ <rdfs:subClassOf rdf:resource="#VFREEBUSY" />
+ <rdfs:subClassOf rdf:resource="#REC-CAL-COMPONENT"/>
+</rdfs:Class>
+
+<!-- VTIMEZONE and VALARM are quite different objects to the other calendar
+components. So although RFC 2445 regards them as calendar components, I
+don't make them subclasses of CAL-COMPONENT -->
+
+<!--MHA: I agree, they are not like the others-->
+
+
+<rdfs:Class
+rdf:ID="VTIMEZONE"
+ rdfs:label="Time zone"
+ rdfs:comment="A time zone object" />
+
+<rdfs:Class
+ rdf:ID="VALARM"
+ rdfs:label="Alarm"
+ rdfs:comment="An alarm object" />
+
+<rdfs:Class
+ rdf:ID="EMAIL-VALARM"
+ rdfs:label="E-Mail alarm"
+ rdfs:comment="An alarm that causes an e-mail to be sent to the attendee">
+ <rdfs:subClassOf rdf:resource="#VALARM"/>
+</rdfs:Class>
+
+<!--Properties-->
+
+<rdfs:Class rdf:ID="Property"
+	rdfs:label="iCalendar property"
+	rdfs:comment="iCalendar properties derive from this.">
+	<rdfs:subClassOf rdf:resource="&rdf;Property"/> 
+</rdfs:Class>
+
+<!-- general calendar properties -->
+
+<iCalendar:Property
+ rdf:ID="CALSCALE"
+ rdfs:label="Calendar scale" 
+ rdfs:comment="The calendar scale used for the calendar information in a
+VCALENDAR. The default is GREGORIAN.">
+<rdfs:domain rdf:resource="#VCALENDAR" /> 
+<rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal" />
+<!-- possibly a better domain - UML heirarchy? text? -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="METHOD"
+ 	rdfs:label="Method" 
+ 	rdfs:comment="See the iTIP RFC for more information about methods">
+	<rdfs:domain rdf:resource="#VCALENDAR" /> 
+	<rdfs:range rdf:resource="#TEXT" />
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="PRODID"
+ 	rdfs:label="Product Identifier" 
+ 	rdfs:comment="The identifier for the product that created the iCalendar
+	object">
+	<rdfs:domain rdf:resource="#VCALENDAR" /> 
+	<rdfs:range rdf:resource="#TEXT" />
+<!-- Possibly a resource -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="VERSION"
+ 	rdfs:label="Version of iCalendar spcecification" 
+ 	rdfs:comment="The higest version number or the minimum and maximum 
+	range of the icalendar specification that is needed to interpret the 
+	iCalendar object">
+<!--not sure how to handle the max/min point - maybe an object? -->
+	<rdfs:domain rdf:resource="#VCALENDAR" /> 
+	<rdfs:range rdf:resource="#TEXT" />
+</iCalendar:Property>
+
+
+<!-- Component properties -->
+
+
+<iCalendar:Property
+	rdf:ID="ATTACH"
+	rdfs:label="Attachment" 
+	rdfs:comment="A property pointing to the URI of an attatchment, or an
+	object with a BINARY value to point to an inline binary object">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:domain rdf:resource="#VALARM" /> 
+	<rdfs:range rdf:resource="#Attachment" /> 
+</iCalendar:Property>
+
+<!-- An attachement can be binary or URI-->
+
+<rdfs:Class rdf:ID="Attachment"/>
+ 
+
+<rdfs:Class
+	rdf:ID="BINARY-Attachment"
+	rdfs:label="Binary Attachment"
+	rdfs:comment="A binary-attachment">
+	<rdfs:subClassOf rdf:resource="#Attachment"/>
+<!-- Correction -->	
+<!--	<rdfs:domain rdf:resource="#BINARY"/> -->
+<!-- A class cannot have rdfs:domain -->
+</rdfs:Class>
+
+<rdfs:Class
+	rdf:ID="URI-Attachment"
+	rdfs:label="URI Attachemnt"
+	rdfs:comment="A URI-attachment">
+	<rdfs:subClassOf rdf:resource="#Attachment"/>
+<!--Correction -->	
+<!--	<rdfs:domain rdf:resource="#URI"/> -->
+<!--A class cannot have rdfs:domain -->
+</rdfs:Class>
+
+<iCalendar:Property
+	rdf:ID="CATEGORIES"
+	rdfs:label="Categories" 
+	rdfs:comment="Subject categories for the CAL-COMPONENT">
+<!-- 
+LM: There are several ways to go with this. Either a bag of literals
+(TEXTs) or separate literals, or (and this is my prefered option) separate
+resources with rdf:values as in DC in RDF. I'm going with the separate
+literals (even though TEXT is a resource it is a very constrainted type)
+option here.
+-->
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+<iCalendar:Property
+	rdf:ID="CLASSIFICATION"
+	rdfs:label="Classification" 
+	rdfs:comment="Classification in terms of privacy of the CAL-COMPONENT">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT" /> 
+	<rdfs:range rdf:resource="#CLASSIFICATION-CHOICE" />
+</iCalendar:Property>
+
+<rdfs:Class rdf:ID="CLASSIFICATION-CHOICE"/>
+
+<!-- 
+The options are 
+PUBLIC
+PRIVATE
+CONFDENTIAL
+-->
+
+<iCalendar:CLASSIFICATION-CHOICE rdf:ID="PUBLIC"/>
+<iCalendar:CLASSIFICATION-CHOICE rdf:ID="PRIVATE"/>
+<iCalendar:CLASSIFICATION-CHOICE rdf:ID="CONFIDENTIAL"/>
+
+
+<iCalendar:Property
+	rdf:ID="DESCRIPTION"
+	rdfs:label="Description" 
+	rdfs:comment="A textual description of the CAL-COMPONENT, more complex
+	than that provided by the SUMMARY property">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+<!--LM: Geographical and location properties. My inclination is to create a
+location object, which can a precise longitude and latitude properties and a
+textual description. But I haven't done that here. Also - why not
+JOURNAL? -->
+
+<!--MHA:   The above idea is ok, I think.  I've implemented it.-->
+
+
+<iCalendar:Property
+ rdf:ID="LOCATION"
+ rdfs:label="Location" 
+ rdfs:comment="This Location can have a Geographical location applied to it.  
+ Otherwise, it is simply a textual description of the location of an EVENT or 
+ TODO.">
+        <rdfs:domain rdf:resource="#VEVENT" /> 
+ 	<rdfs:domain rdf:resource="#VTODO" /> 
+ 	<rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+<!-- GEO seems ito be missing. added 2001-07-16 by libby -->
+
+
+<rdfs:Class rdf:ID="GEO"
+ rdfs:label="Geographical position"
+ rdfs:comment="A geographical location. May have a TEXT description and/or
+long/lat properties">
+ <rdfs:subClassOf rdf:resource="&xmlsdt;base64binary" />
+</rdfs:Class>
+
+
+<!-- added 2001-07-16 by libby. Could maybe use CN or similar instead of
+being so specific -->
+
+
+<rdf:Property
+ rdf:ID="GEO-NAME"
+ rdfs:label="Geographical location name"
+ rdfs:comment="Geographical location name">
+ <rdfs:domain rdf:resource="#GEO"/>
+ <rdfs:range rdf:resource="#TEXT" />
+</rdf:Property>
+
+
+<!-- changed LOCATIONs to GEOs as domains  2001-07-16 libby -->
+
+
+<rdf:Property
+ rdf:ID="LONGITUDE"
+ rdfs:label="Longitude"
+ rdfs:comment="The longitude must be between 0 and 180">
+ <rdfs:domain rdf:resource="#GEO"/>
+ <rdfs:range rdf:resource="#FLOAT" />
+</rdf:Property>
+
+<rdf:Property
+ rdf:ID="LATITUDE"
+ rdfs:label="Latitude"
+ rdfs:comment="The latitude must be between 0 and 90">
+ <rdfs:domain rdf:resource="#GEO"/>
+ <rdfs:range rdf:resource="#FLOAT" />
+</rdf:Property>
+
+<!-- end of location properties -->
+
+
+<iCalendar:Property
+	rdf:ID="PERCENT-COMPLETE"
+ 	rdfs:label="Percent complete" 
+ 	rdfs:comment="This property is used by an assignee or delegatee of a 
+	VTODO to convey the percent completion of a VTODO to the ORGANIZER">
+	<rdfs:domain rdf:resource="#VTODO" /> 
+	<rdfs:domain rdf:resource="#VEVENT" /> 
+	<rdfs:range rdf:resource="#INTEGER" />
+	<!-- ignoring the sign of the INTEGER, presumably -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="PRIORITY"
+ 	rdfs:label="Priority" 
+ 	rdfs:comment="Defines the relative priority for a calendar component
+	(VEVENT or VTODO)">
+	<rdfs:domain rdf:resource="#VTODO" /> 
+	<rdfs:domain rdf:resource="#VEVENT" /> 
+	<rdfs:range rdf:resource="#INTEGER" />
+	<!-- ignoring the sign of the INTEGER, presumably -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="RESOURCES"
+ 	rdfs:label="Resources" 
+ 	rdfs:comment="The equipment or resources anticipated for an activity
+	specified by a calendar entity">
+<!-- 
+Similar considerations apply here as with the CATEGORIES: i.e. bag or
+separate, literals or resources. This should probably be resources in
+either case, because institutions will need to assign internal identifiers
+to resources. Here I have used literals (i.e. the constrained resource
+type TEXT), in keeping with the RFC 2445.
+This could possibly be extended to encompass ABC-style inputs to a meeting
+(including documents for example). Outputs would also be useful. 
+-->
+ 	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="STATUS"
+ 	rdfs:label="Status" 
+ 	rdfs:comment="The overall status or confirmation for the calendar
+	component, used by the ORGANIZER to indicate whether an event is
+	(definitely) aking place."> 
+<!-- 
+possible values for VEVENT are:
+TENTATIVE
+CONFIRMED
+CANCELLED
+possible values for VTODO are:
+NEEDS-ACTION
+COMPLETED
+IN-PROCESS
+CANCELLED
+possible values for VJOURNAL are:
+DRAFT
+FINAL
+CANCELLED
+possibly a literal would be more appropriate
+MHA: This should probably be a set of choices like CLASSIFICATION
+Since the choices are different, this should be subclassed, probably.
+-->
+</iCalendar:Property>
+
+<iCalendar:Property
+	rdf:ID="VEVENT-STATUS"
+ 	rdfs:label="Event Status" 
+ 	rdfs:comment="The overall status or confirmation for the event, 
+	used by the ORGANIZER to indicate whether an event is
+	(definitely) aking place."> 
+	<rdfs:domain rdf:resource="#VEVENT"/> 
+	<rdfs:range rdf:resource="#VEVENT-STATUS-CHOICE" />
+<!-- Correction: Since STATUS has been defined as a Property, the
+subPropertyOf should be used -->
+<!--	<rdfs:subClassOf rdf:resource="#STATUS"/> -->
+	<rdfs:subPropertyOf rdf:resource="#STATUS"/>
+</iCalendar:Property>
+
+<rdfs:Class rdf:ID="VEVENT-STATUS-CHOICE"/>
+
+<!--possible values for VEVENT are:-->
+<iCalendar:VEVENT-STATUS-CHOICE rdf:ID="TENTATIVE"/>
+<iCalendar:VEVENT-STATUS-CHOICE rdf:ID="CONFIRMED"/>
+<iCalendar:VEVENT-STATUS-CHOICE rdf:ID="CANCELLED">
+   <rdf:type rdf:resource="#VTODO-STATUS-CHOICE"/>
+   <rdf:type rdf:resource="#VJOURNAL-STATUS-CHOICE"/>
+</iCalendar:VEVENT-STATUS-CHOICE>   
+
+<iCalendar:Property
+	rdf:ID="VTODO-STATUS"
+ 	rdfs:label="ToDo Status" 
+ 	rdfs:comment="The overall status or confirmation for the todo, 
+	used by the ORGANIZER to indicate the status of the todo.">
+	<rdfs:domain rdf:resource="#VTODO"/> 
+	<rdfs:range rdf:resource="#VTODO-STATUS-CHOICE" />
+<!-- Correction: Since STATUS has been defined as a Property, the
+subPropertyOf should be used -->
+<!--	<rdfs:subClassOf rdf:resource="#STATUS"/> -->
+	<rdfs:subPropertyOf rdf:resource="#STATUS"/>
+</iCalendar:Property>
+
+<rdfs:Class rdf:ID="VTODO-STATUS-CHOICE"/>
+
+<!--possible values for VTODO are:-->
+<iCalendar:VTODO-STATUS-CHOICE rdf:ID="NEEDS-ACTION"/>
+<iCalendar:VTODO-STATUS-CHOICE rdf:ID="COMPLETED_STATUS"/>
+<iCalendar:VTODO-STATUS-CHOICE rdf:ID="IN-PROCESS"/>
+<!-- The ID CANCELLED is not unique -->
+<!-- Through the mechanism of multiple classification of resources, it was defined above -->
+<!-- <iCalendar:VTODO-STATUS-CHOICE rdf:ID="CANCELLED"/> -->
+
+
+<iCalendar:Property
+	rdf:ID="VJOURNAL-STATUS"
+ 	rdfs:label="Journal Status" 
+ 	rdfs:comment="The overall status of the Journal entry.">
+	<rdfs:domain rdf:resource="#VJOURNAL"/> 
+	<rdfs:range rdf:resource="#VJOURNAL-STATUS-CHOICE" />
+<!-- Correction: Since STATUS has been defined as a Property, the
+subPropertyOf should be used -->
+<!--	<rdfs:subClassOf rdf:resource="#STATUS"/> -->
+	<rdfs:subPropertyOf rdf:resource="#STATUS"/>
+</iCalendar:Property>
+
+<rdfs:Class rdf:ID="VJOURNAL-STATUS-CHOICE"/>
+
+<!--possible values for VJOURNAL are:-->
+<iCalendar:VJOURNAL-STATUS-CHOICE rdf:ID="DRAFT"/>
+<iCalendar:VJOURNAL-STATUS-CHOICE rdf:ID="FINAL"/>
+<!-- The ID CANCELLED is not unique -->
+<!-- Through the mechanism of multiple classification of resources, it was defined above -->
+<!-- <iCalendar:VJOURNAL-STATUS-CHOICE rdf:ID="CANCELLED"/> -->
+
+<iCalendar:Property
+	rdf:ID="SUMMARY"
+	rdfs:label="Summary" 
+	rdfs:comment="A one-line textual summary of the CAL-COMPONENT or VALARM">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:domain rdf:resource="#VALARM" /> 
+	<rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+<!-- Date and time component properties -->
+
+<iCalendar:Property
+	rdf:ID="COMPLETED"
+	rdfs:label="Completed" 
+	rdfs:comment="Defines the date and time that a VTODO was actually completed. The date and time must be in UTC format (i.e suffixed with	a Z)">
+	<rdfs:domain rdf:resource="#VTODO" /> 
+	<rdfs:range rdf:resource="#DATE-TIME" />
+<!--LM: It would be more general to make the domain a DATE rather than a 
+DATE-TIME. -->
+<!--MHA: Or perhaps a TimeEntry -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="DTEND"
+	rdfs:label="Date-time end" 
+	rdfs:comment="The date and time that the a calendar component ends">
+	<rdfs:domain rdf:resource="#VEVENT" /> 
+	<rdfs:domain rdf:resource="#VFREEBUSY" /> 
+	<rdfs:range rdf:resource="#TimeEntry" />
+<!--LM: The default range in RFC 2445 is DATE-TIME, but since we have made
+DATE-TIME a subclass of DATE, and the domain can be DATE-TIME or DATE, we
+make the range a DATE. -->
+<!--MHA: If we subclass DATE and DATE-TIME from TimeEntry, we can
+use TimeEntry as the range.-->
+</iCalendar:Property>
+
+<iCalendar:Property
+	rdf:ID="DUE"
+ 	rdfs:label="Date time due" 
+ 	rdfs:comment="Defines the date and time when the VTODO is expected to 
+	be completed">
+	<rdfs:domain rdf:resource="#VTODO" /> 
+	<rdfs:range rdf:resource="#TimeEntry" /> 
+<!--LM: The default range in RFC 2445 is DATE-TIME, but since we have made
+DATE-TIME a subclass of DATE, and the domain can be DATE-TIME or DATE, we
+make the range a DATE. -->
+<!--MHA: If we subclass DATE and DATE-TIME from TimeEntry, we can
+use TimeEntry as the range.-->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="DTSTART"
+	rdfs:label="Date time start" 
+ 	rdfs:comment="Specifies when the calendar component begins. If used 
+	with a VFREEBUSY component, the time must be in UTC format">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:domain rdf:resource="#VTIMEZONE" /> 
+	<rdfs:range rdf:resource="#DATE" /> 
+<!--LM: The default range in RFC 2445 is DATE-TIME, but since we have made
+DATE-TIME a subclass of DATE, and the domain can be DATE-TIME or DATE, we
+make the range a DATE. -->
+<!--MHA: If we subclass DATE and DATE-TIME from TimeEntry, we can
+use TimeEntry as the range.-->
+</iCalendar:Property>
+
+<!-- For DURATION also see the DAML-S work (also instant) -->
+<!-- Also, there is a DURATION datatype in the XML Schema -->
+
+<iCalendar:Property
+	rdf:ID="DURATION-PROP"
+	rdfs:label="Duration" 
+	rdfs:comment="A positive duration of time">
+	<rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+	<rdfs:domain rdf:resource="#VALARM" /> 
+	<rdfs:range rdf:resource="#DURATION" />
+</iCalendar:Property>
+
+
+<iCalendar:Property
+	rdf:ID="FREEBUSY-PROP"
+	rdfs:label="Free-busy time" 
+	rdfs:comment="Defines one or more free or busy time intervals. the
+	duration times and dates must be in UTC format">
+	<rdfs:domain rdf:resource="#VFREEBUSY" /> 
+	<rdfs:range rdf:resource="#PERIOD" /> 
+</iCalendar:Property>
+
+
+<iCalendar:Property
+ rdf:ID="TRANSP"
+ rdfs:label="Time transparency" 
+ rdfs:comment="Defines whether an event is transparent or not to busy 
+ time searches. VJOURNALs, for example, are always transparent, as are 
+ VTODOS. VEVENTS can be made so."> 
+<!--
+TRANSPARENT
+OPAQUE
+possibly a literal would be more appropriate
+MHA: Perhaps a choice - see Classification above
+-->
+ <rdfs:domain rdf:resource="#VEVENT" /> 
+ <rdfs:range rdf:resource="#TRANSP-CHOICE" />
+</iCalendar:Property>
+
+<rdfs:Class rdf:ID="TRANSP-CHOICE"/>
+
+<iCalendar:TRANSP-CHOICE rdf:ID="TRANSPARENT"/>
+<iCalendar:TRANSP-CHOICE rdf:ID="OPAQUE"/>
+
+
+<!-- Time zone component properties -->
+
+
+<iCalendar:Property
+ rdf:ID="TZID"
+ rdfs:label="Time zone identifier" 
+ rdfs:comment="Specifies the identifier (TEXT in the RFC 2445) that uniquely
+ identifies the VTIMEZONE calendar component. It must be specified in a
+ VTIMEZONE component">
+ <!-- 
+ I've made this a resource rather than TEXT 
+ Could it also be specified on other objects??
+ -->
+ <rdfs:domain rdf:resource="#VTIMEZONE" />
+ <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource" />
+</iCalendar:Property>
+
+
+<iCalendar:Property
+ rdf:ID="TZNAME"
+ rdfs:label="Time zone name" 
+ rdfs:comment="The customary designation for a time zone description. you
+ can also have a language tag on this, which indicates that TEXT
+ should be a subclass of resource, not literal (this is what I have done)">
+ <rdfs:domain rdf:resource="#VTIMEZONE" />
+ <rdfs:range rdf:resource="#TEXT" /> 
+</iCalendar:Property>
+
+
+
+<iCalendar:Property
+rdf:ID="TZOFFSETFROM"
+ rdfs:label="Time zone offset from" 
+ rdfs:comment="Specifies the offset which is in use prior to this time zone
+observance. Must be specified in a VTIMEZONE calendar component">
+<rdfs:domain rdf:resource="#VTIMEZONE" />
+<rdfs:range rdf:resource="#UTC-OFFSET" />
+</iCalendar:Property>
+
+
+<iCalendar:Property
+rdf:ID="TZOFFSETTO"
+ rdfs:label="Time zone offset to" 
+ rdfs:comment="Specifies the offset which is in this time zone
+observance. Must be specified in a VTIMEZONE calendar component">
+<rdfs:domain rdf:resource="#VTIMEZONE" />
+<rdfs:range rdf:resource="#UTC-OFFSET" />
+</iCalendar:Property>
+
+
+<iCalendar:Property
+ rdf:ID="TZURL"
+ rdfs:label="Time zone url" 
+ rdfs:comment="Points to a network resource which a VTIMEZONE can point to
+ to get an up-to-date versioon of itself. It can be specified in a VTIMEZONE
+ calendar component">
+ <rdfs:domain rdf:resource="#VTIMEZONE" />
+ <rdfs:range rdf:resource="#URI" />
+</iCalendar:Property>
+
+
+<!-- relationship component properties -->
+
+<!-- see also property parameters -->
+
+<iCalendar:Property
+ rdf:ID="ATTENDEE"
+ rdfs:label="Attendee" 
+ rdfs:comment="Defines an attendee within a calendar component">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+ <rdfs:domain rdf:resource="#EMAIL-VALARM"/>
+ <rdfs:range rdf:resource="#CAL-ADDRESS"/> 
+</iCalendar:Property>
+
+
+
+<iCalendar:Property
+ rdf:ID="CONTACT"
+ rdfs:label="Contact" 
+ rdfs:comment="A representation or a reference to contact information
+ associated with a calendar component">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+ <rdfs:range rdf:resource="#TEXT"/> 
+<!-- 
+LM: This is a very confusing one. Contact information would be better attatched
+to a CAL-USER or other agent. Presumably the contact for a given event is
+the organizer? 
+
+Note that a calendar address should be an object not just an address.
+-->
+
+<!--
+MHA: I believe that TEXT will do here, with an altrepparam of a URI 
+available if needed.
+Incidentally, this could be the organizer or some other contact person (such
+as if the organizer is out of town?).  I think it's like reply-to wrt email.
+-->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+ rdf:ID="ORGANIZER"
+ rdfs:label="Organizer" 
+ rdfs:comment="Points to the organizer of the calendar component">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+ <rdfs:range rdf:resource="#CAL-ADDRESS"/> 
+ <!--
+ Note that a calendar address should be an object not just an address.
+ -->
+</iCalendar:Property>
+
+
+<iCalendar:Property
+ rdf:ID="RECURRANCE-ID"
+ rdfs:label="Recurrance identifier" 
+ rdfs:comment="An identifier for a specific instance of a REC-CAL-COMPONENT 
+ (a VEVENT, VTODO or VJOURNAL)">
+ <rdfs:domain rdf:resource="#REC-CAL-COMPONENT"/> 
+ <rdfs:range rdf:resource="#TimeEntry" />
+ <!--
+ LM: DATE is used as the superclass of DATE-TIME.
+ MHA: I changed it to be a TimeEntry, which is the superclass of DATE and DATE-
+      TIME in this schema.
+
+ LM: The RFC 2445 says that RECURRANCE-ID should be the DTSTART of the
+ REC-CAL-COMPONENT, i.e. the date the repetitions started, NOT the date and
+ time of instances of the REC-CAL-COMPONENT starting. I think this is
+ confusing, subject to becoming unlinked with the DTSTART value (which can
+ change through exceptions) and non-globally unique.
+ see also #RANGE
+ -->
+</iCalendar:Property>
+
+<rdf:Property
+ rdf:ID="RELATED-TO"
+ rdfs:label="Related to" 
+ rdfs:comment="A relationship or reference between one calendar component
+ and another">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT" /> 
+ <rdfs:range rdf:resource="&rdfs;Resource" />
+ <!--
+ LM: RELATED-TO has to be a class unless we make the RELTYPE values 
+ subproperties of RELTYPE. I think this is what we would have to do. It could 
+ be useful for specifying the details of a meeting or track at a conference in  greater detail.
+ MHA: Not sure about this.  For now, I've made it rdf;Resource, so it 
+ encompasses all components.
+ -->
+</rdf:Property>
+
+<!--
+ MHA: URL used to have a domain of VCALENDAR, which seems wrong.  I've made it 
+      CAL-COMPONENT 
+-->
+
+
+<rdf:Property
+ rdf:ID="URL"
+ rdfs:label="URL" 
+ rdfs:comment="Points to a URL at whihc this calendar information may be
+ found, for example a more recent version">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT" />
+ <rdfs:range rdf:resource="#URI" />
+</rdf:Property>
+
+
+
+<rdf:Property
+ rdf:ID="UID"
+ rdfs:label="Unique identifier" 
+ rdfs:comment="The globally unique identifier for the calendar component">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT" />
+ <rdfs:range rdf:resource="&rdfs;Resource" />
+ <!-- in RFC 2445 the range is a TEXT object, but it should definitely be a 
+ resource --> 
+</rdf:Property>
+
+
+<!-- recurrance component properties -->
+
+<rdf:Property
+ rdf:ID="EXDATE"
+ rdfs:label="Recurrance Date exceptions" 
+ rdfs:comment="Defines the list of date/time exceptions for a recurring
+ calendar component">
+ <rdfs:domain rdf:resource="#REC-CAL-COMPONENT" /> 
+ <rdfs:range rdf:resource="#TimeEntry" /> 
+ <!--
+ LM: Using Date as superclass of DATE-TIME.
+ MHA: I changed this to TimeEntry. (Superclass of DATE and DATE-TIME)
+ This might be better as a bag
+ -->
+</rdf:Property>
+
+<rdf:Property
+ rdf:ID="EXRULE"
+ rdfs:label="Recurrance exception rule" 
+ rdfs:comment="Points to a rule or repeating pattern for an exception to a
+ recurrance set">
+ <rdfs:domain rdf:resource="#REC-CAL-COMPONENT"/> 
+ <rdfs:range rdf:resource="#RECUR" />
+</rdf:Property>
+
+
+<rdf:Property
+ rdf:ID="RDATE"
+ rdfs:label="Recurrance date" 
+ rdfs:comment="Defines the list of dates/times for a recurring
+ calendar component">
+ <rdfs:domain rdf:resource="#REC-CAL-COMPONENT" /> 
+ <rdfs:range rdf:resource="#TimeEntry" /> 
+ <!--
+ LM: Using Date as superclass of DATE-TIME.
+ MHA: Changed it to TimeEntry
+ This might be better as a bag
+ -->
+</rdf:Property>
+
+
+
+<rdf:Property
+ rdf:ID="RRULE"
+ rdfs:label="Recurrance rule" 
+ rdfs:comment="Points to a rule or repeating pattern for an exception to a
+ recurrance set">
+ <rdfs:domain rdf:resource="#REC-CAL-COMPONENT" /> 
+ <rdfs:range rdf:resource="#RECUR" />
+</rdf:Property>
+
+
+<!-- recurrance properties
+
+#FREQ
+#COUNT
+#UNTIL
+#INTERVAL
+#BYSECOND
+#BYMINUTE
+#BYHOUR
+#BYMONTHDAY
+#BYYEARDAY
+#BYWEEKNO
+#BYMONTH
+#BYSETPOS
+#WKSET
+
+-->
+
+
+
+
+<rdf:Property rdf:ID="FREQ"
+ rdfs:label="Frequency" 
+ rdfs:comment="The type of the recurrance rule">
+ <rdfs:domain rdf:resource="#RECUR" />
+ <rdfs:range rdf:resource="#TEXT" />
+<!--
+SECONDLY
+MINUTELY
+HOURLY
+DAILY
+WEEKLY
+MONTHLY
+YEARLY
+possibly should be a literal
+MHA: or some kind of choice.
+-->
+</rdf:Property>
+
+
+<rdf:Property rdf:ID="INTERVAL"
+ rdfs:label="Interval" 
+ rdfs:comment="How often the recurrance rule repeats. The dfault is 1,
+i.e. _every_ year etc">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign ignored -->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="UNTIL"
+ rdfs:label="Until" 
+ rdfs:comment="Defines a date-time value which bounds the recurrance rule in
+an inclusive manner. If a DATE, must be UTC">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#TimeEntry" />
+<!--
+LM: Date used as superclass of DATE-TIME
+MHA: Changed to TimeEntry
+-->
+</rdf:Property>
+
+
+<rdf:Property
+rdf:ID="COUNT"
+ rdfs:label="Count" 
+ rdfs:comment="the number of occurrances at which to range-bound the
+recurance. If specified, the DTSTART value counts as the first of these">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign ignored -->
+</rdf:Property>
+
+
+<rdf:Property rdf:ID="BYSECOND"
+ rdfs:label="By second" 
+ rdfs:comment="A list of second values for recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign ignored 0-59 only. maybe should be a bag -->
+</rdf:Property>
+
+
+<rdf:Property rdf:ID="BYMINUTE"
+ rdfs:label="By minute" 
+ rdfs:comment="A list of minute values for recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign ignored 0-59 only. maybe should be a bag -->
+</rdf:Property>
+
+
+<rdf:Property
+rdf:ID="BYHOUR"
+ rdfs:label="By hour" 
+ rdfs:comment="A list of hour values for recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign ignored 0-23 only. maybe should be a bag -->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="BYDAY"
+ rdfs:label="By day" 
+ rdfs:comment="A list of day values for recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#TEXT" />
+
+<!-- 
+MO
+TU
+WE
+TH
+FR
+SA
+SU
+It can also be prefixed by a positive or negative integer representing the
+nth occurance of the day from the beginning or end of the month.
+So this is looking like a day object or a day of the month object.
+Maybe should be literals, maybe should be a bag 
+MHA: maybe should be choices
+-->
+</rdf:Property>
+
+
+<rdf:Property rdf:ID="BYMONTHDAY"
+ rdfs:label="By month day" 
+ rdfs:comment="A list of INTEGERS representing days in a month values for
+recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign represents from the beginning/end of the month.
+ 0-31 only. Maybe should be a bag -->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="BYYEARDAY"
+ rdfs:label="By year day" 
+ rdfs:comment="A list of INTEGERS representing days in a year values for
+recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign represents from the beginning/end of the year.
+ 0-366 only. Maybe should be a bag -->
+</rdf:Property>
+
+
+<rdf:Property rdf:ID="BYWEEKNO"
+ rdfs:label="By week number" 
+ rdfs:comment="A list of INTEGERS representing weeks in a year values for
+recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign represents from the beginning/end of the year.
+ 0-53 only. Maybe should be a bag -->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="BYMONTH"
+ rdfs:label="By month" 
+ rdfs:comment="A list of INTEGERS representing months in a year values for
+recurrance">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign represents from the beginning/end of the year.
+ 0-12 only. Maybe should be a bag -->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="WKST"
+ rdfs:label="Working week start" 
+ rdfs:comment="Specifies the day on which the working week starts">
+<!-- 
+MO
+TU
+WE
+TH
+FR
+SA
+SU
+MHA: Should probably be choices.
+-->
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#TEXT" />
+<!-- 
+maybe should be a literal; maybe a bag
+-->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="BYSETPOS"
+ rdfs:label="By set position" 
+ rdfs:comment="A list of INTEGERS representing the nth occurrance of the
+repetition within the set of evets specified by the rule">
+<rdfs:domain rdf:resource="#RECUR" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- INTEGER sign represents from the beginning/end of the set.
+Maybe should be a bag -->
+</rdf:Property>
+
+
+<!-- Alarm component properties -->
+
+
+
+<rdf:Property rdf:ID="ACTION"
+ rdfs:label="Action" 
+ rdfs:comment="The action to be invoked when the alarm is triggered. Must
+be specified once in a VALARM">
+<rdfs:domain rdf:resource="#VALARM" />
+<rdfs:range rdf:resource="#TEXT" />
+<!-- 
+AUDIO
+DISPLAY
+EMAIL
+PROCEEDURE
+LM: maybe should be literal
+
+MHA: Actually, this is a bit more complicated since each action 
+denotes a different kind of alarm, really.  Perhaps it should be 
+folded into subclasses of VALARM?
+-->
+</rdf:Property>
+
+
+
+<rdf:Property rdf:ID="REPEAT"
+ rdfs:label="Repeat Count" 
+ rdfs:comment="The number of times the alarm should be repeated after the
+initial trigger">
+<rdfs:domain rdf:resource="#VALARM" />
+<rdfs:range rdf:resource="#INTEGER" />
+<!-- 
+sign ignored
+-->
+</rdf:Property>
+
+
+<iCalendar:Property rdf:ID="TRIGGER"
+ rdfs:label="Trigger" 
+ rdfs:comment="When an alarm is triggered">
+<rdfs:domain rdf:resource="#VALARM" />
+<!-- 
+LM: but range can also be a DATE-TIME (UTC). The relationship between these
+needs more specification. The duration is used because it is the positive or
+negative distance in time from the beginning or end of the event.
+see also #RELATED
+MHA: Ok, how about we subclass the TRIGGER (REL-TRIGGER and ABS-TRIGGER), 
+since they have different parameters.
+-->
+</iCalendar:Property>
+
+<iCalendar:Property rdf:ID="REL-TRIGGER"
+ rdfs:label="Relative Trigger"
+ rdfs:comment="When an alarm is triggered -- relative to the associated event
+ or todo">
+ <!-- Correction: Since TRIGGER has been defined as a Property, the
+subPropertyOf should be used -->
+<!--	<rdfs:subClassOf rdf:resource="#TRIGGER"/> -->
+<rdfs:domain rdf:resource="#VALARM" />
+ <rdfs:subPropertyOf rdf:resource="#TRIGGER"/>
+ <rdfs:range rdf:resource="#DURATION"/>
+</iCalendar:Property>
+
+<iCalendar:Property rdf:ID="ABS-TRIGGER"
+ rdfs:label="Absolute Trigger"
+ rdfs:comment="When an alarm is triggered -- date and time or just date.">
+<!-- Correction: Since TRIGGER has been defined as a Property, the
+subPropertyOf should be used -->
+<!--	<rdfs:subClassOf rdf:resource="#TRIGGER"/> -->
+ <rdfs:subPropertyOf rdf:resource="#TRIGGER"/>
+<rdfs:domain rdf:resource="#VALARM" />
+<rdfs:range rdf:resource="#TimeEntry"/>
+</iCalendar:Property>
+
+
+
+<!-- change management component properties -->
+
+
+
+<iCalendar:Property rdf:ID="CREATED"
+ rdfs:label="Date/time created" 
+ rdfs:comment="Date/time a CAL-COMPONENT was created (not VFREEBUSY) (UTC)">
+<rdfs:domain rdf:resource="#CAL-COMPONENT" /> 
+<rdfs:range rdf:resource="#DATE-TIME" />
+</iCalendar:Property>	
+
+
+<iCalendar:Property rdf:ID="DTSTAMP"
+ rdfs:label="Date/time stamp" 
+ rdfs:comment="Date/time a VCALENDAR was created (UTC)">
+<rdfs:domain rdf:resource="#VCALENDAR" />
+<rdfs:range rdf:resource="#DATE-TIME" />
+</iCalendar:Property>	
+
+
+<iCalendar:Property rdf:ID="LAST-MODIFIED"
+ rdfs:label="Date/time last modified" 
+ rdfs:comment="Date/time a CAL-COMPONENT was last modified (not VFREEBUSY) 
+(UTC)">
+ <!-- 
+ why not VFREEBUSY? 
+ -->
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+ <rdfs:domain rdf:resource="#VTIMEZONE" />
+ <rdfs:range rdf:resource="#DATE-TIME" />
+</iCalendar:Property>	
+
+
+
+<iCalendar:Property rdf:ID="SEQUENCE"
+ rdfs:label="Sequence" 
+ rdfs:comment="The revision number of a calendar component wh=ithin a
+ sequence of revisions (not VFREEBUSY)">
+ <!--
+ starts with ); any time the ORGANIZER makes changes to
+ DTSTART
+ DTEND
+ DUE
+ RDATE
+ RRULE
+ EXDATE
+ EXRULEW
+ STATUS
+ the sequence number must be incremented.
+ The ORGANIZER can also force an increment is he thinks that a change made
+ may jeopardize attendance
+ why not VFREEBUSY?
+ -->
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/> 
+ <rdfs:range rdf:resource="#INTEGER" />
+</iCalendar:Property>	
+
+
+<!-- Miscellaneous component properties -->
+
+<!-- Non standard properties -->
+
+<!-- These can be applied to all iCal components.  For now,
+     I've made the domain resource.  -->
+
+<iCalendar:Property rdf:ID="X-PROP"
+ rdfs:label="Non-standard Property"
+ rdfs:comment="Any properties that aren't pre-defined.">
+ <rdfs:domain rdf:resource="#CAL-COMPONENT"/>
+ <rdfs:domain rdf:resource="#VALARM"/>
+ <rdfs:domain rdf:resource="#VTIMEZONE"/>
+ <rdfs:range rdf:resource="&rdfs;Resource"/> 
+</iCalendar:Property>
+
+<!-- Request status -->
+
+<iCalendar:Property rdf:ID="REQUEST-STATUS"
+ rdfs:label="Request status" 
+ rdfs:comment="The status code for a scheduling request">
+<rdfs:domain rdf:resource="#CAL-COMPONENT" /> 
+<rdfs:range rdf:resource="#TEXT" />
+</iCalendar:Property>	
+
+
+<!-- iCalendar Parameters-->
+
+<rdfs:Class rdf:ID="Parameter"
+ rdfs:label="Property Parameter"
+ rdfs:comment="All iCalendar property parameters subclass from this class">
+ <rdfs:subClassOf rdf:resource="&rdf;Property"/>
+</rdfs:Class>  
+
+<iCalendar:Parameter rdf:ID="ALTREP">
+	<rdfs:comment>Alternate Text Representation</rdfs:comment>
+
+<!-- According to the RDF Schema Specification, the value of a domain property
+should be a class. However, DESCRIPTION, LOCATION etc are defined as
+Properties -->
+
+<!--	<rdfs:domain rdf:resource="#DESCRIPTION"/> -->
+<!-- COMMENT has not been defined -->
+<!--        <rdfs:domain rdf:resource="#COMMENT"/> -->
+<!--	<rdfs:domain rdf:resource="#LOCATION"/> -->
+<!--	<rdfs:domain rdf:resource="#RESOURCES"/> -->
+<!--	<rdfs:domain rdf:resource="#SUMMARY"/> -->
+<!--	<rdfs:domain rdf:resource="#CONTACT"/> -->
+        <rdfs:range rdf:resource="#URI"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="CN">
+	<rdfs:comment>Common Name</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+<!--	<rdfs:domain rdf:resource="#ORGANIZER"/> -->
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="CUTYPE">
+	<rdfs:comment>Calendar User Type</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="DELEGATED-FROM">
+	<rdfs:comment>Delegators</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="#CAL-ADDRESS"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="DELEGATED-TO">
+	<rdfs:comment>Delegatees</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="#CAL-ADDRESS"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="DIR">
+	<rdfs:comment>Directory Entry Reference</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/>
+	<rdfs:domain rdf:resource="#ORGANIZER"/> -->
+	<rdfs:range rdf:resource="#URI"/>
+</iCalendar:Parameter>
+
+<!-- 
+ MHA: What does the inline encoding paramter apply to? 
+-->
+
+<iCalendar:Parameter rdf:ID="ENCODING">
+	<rdfs:comment>Inline Encoding</rdfs:comment>
+	<rdfs:range rdf:resource="&rdfs;Resource"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="FMTTYPE">
+	<rdfs:comment>Format Type</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTACH"/> -->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="FBTYPE">
+	<rdfs:comment>Free/Busy Time Type</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#FREEBUSY-PROP"/> -->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="LANGUAGE">
+	<rdfs:comment>Language</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#CATEGORIES"/> -->
+<!--	<rdfs:domain rdf:resource="#COMMENT"/> -->
+<!--	<rdfs:domain rdf:resource="#LOCATION"/> -->
+<!--	<rdfs:domain rdf:resource="#RESOURCES"/> -->
+<!--	<rdfs:domain rdf:resource="#SUMMARY"/> -->
+<!--	<rdfs:domain rdf:resource="#TZNAME"/> -->
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+<!--	<rdfs:domain rdf:resource="#CONTACT"/> 
+	<rdfs:domain rdf:resource="#ORGANIZER"/> -->
+<!--        <rdfs:domain rdf:resource="#X-PROP"/> -->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="MEMBER">
+	<rdfs:comment>Group or List Membership</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="#CAL-ADDRESS"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="PARTSTAT">
+	<rdfs:comment>Participation Status</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+
+<!-- 
+ The RANGE should be one of two choices - THISANDPRIOR and THISANDFUTURE.
+-->
+
+<rdfs:Class rdf:ID="RANGE-CHOICE"/>
+
+<iCalendar:Parameter rdf:ID="RANGE">
+	<rdfs:comment>Recurrence Identifier Range</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#RECURRANCE-ID"/> -->
+	<rdfs:range rdf:resource="&rdfs;Literal"/>
+</iCalendar:Parameter>
+
+<iCalendar:RANGE-CHOICE rdf:ID="THISANDPRIOR"/>
+<iCalendar:RANGE-CHOICE rdf:ID="THISANDFUTURE"/>
+
+
+<iCalendar:Parameter rdf:ID="RELTYPE">
+	<rdfs:comment>Alarm Trigger Relationship</rdfs:comment>
+<!--	<rdfs:domain rdf:resource=""/> -->
+<!--
+PARENT
+CHILD
+SIBLING
+This property means that RELATED-TO has to be a class unless we make the
+RELTYPE values subproperties of RELTYPE. I think this is what we would have 
+to do. It could be useful for specifying the details of a meeting or track
+at a conference in greater detail.
+-->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+
+<!-- another three-way relationship - the role of an attendee in event-->
+
+<iCalendar:Parameter rdf:ID="ROLE">
+	<rdfs:comment>Participation Role</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+	<rdfs:range rdf:resource="#TEXT"/>
+</iCalendar:Parameter>
+<!--
+
+CHAIR
+REQ-PARTICIPANT 
+OPT-PARTICIPANT 
+NON-PARTICIPANT 
+
+(MHA: and anything else, really.)
+-->
+
+
+<iCalendar:Parameter rdf:ID="RSVP">
+	<rdfs:comment>RSVP Expectation</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/> -->
+<!-- 
+LM: another three-way relationship - the RSVP expectation from the 
+cal-user as regards the event
+
+MHA: actually, this and the previous ROLE can only be applied to attendees 
+(not organizer, for example)
+-->
+	<rdfs:range rdf:resource="#BOOLEAN"/>
+</iCalendar:Parameter>
+
+
+<iCalendar:Parameter rdf:ID="SENT-BY">
+	<rdfs:comment>Sent By</rdfs:comment>
+<!--	<rdfs:domain rdf:resource="#ATTENDEE"/>
+	<rdfs:domain rdf:resource="#ORGANIZER"/> -->
+	<rdfs:range rdf:resource="#CAL-ADDRESS"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="TZID_PARAMETER">
+	<rdfs:comment>"Specifies the identifier for the time zone definition.
+Uniquely identifies a VTIMEZONE calendar component"</rdfs:comment>
+<!-- in RFC 2445 this is a string, but should be aresource -->
+<!--	<rdfs:domain rdf:resource="#DTSTART"/> -->
+<!--	<rdfs:domain rdf:resource="#DUE"/> -->
+<!--	<rdfs:domain rdf:resource="#RECURRANCE-ID"/> -->
+<!--	<rdfs:domain rdf:resource="#EXDATE"/>  -->
+<!--	<rdfs:domain rdf:resource="#RDATE"/>  -->
+	<rdfs:range rdf:resource="&rdfs;Resource"/>
+</iCalendar:Parameter>
+
+<iCalendar:Parameter rdf:ID="VALUE">
+	<rdfs:comment>Value Data Type</rdfs:comment>
+	<rdfs:range rdf:resource="&rdfs;Resource"/>
+</iCalendar:Parameter>
+
+
+</rdf:RDF>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<rdf:RDF xml:lang="en"
+	 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"> 
+	
+	 
+	<rdfs:Class rdf:ID="N1">
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="N2">
+		<rdfs:subClassOf rdf:resource="#N1"/>
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="N3">
+		<rdfs:subClassOf rdf:resource="#N1"/>
+	</rdfs:Class>
+
+	<rdfs:Class rdf:ID="N4">
+		<rdfs:subClassOf rdf:resource="#N3"/>
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="N5">
+		<rdfs:subClassOf rdf:resource="#N3"/>
+	</rdfs:Class>
+</rdf:RDF>
+

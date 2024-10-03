@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF 
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+	<!-- !!!!!!!!!!!!!!!!!! Classes !!!!!!!!!!!!!!! -->
+	<rdfs:Class rdf:ID="Schema"/>
+	
+	<!-- A controlled vocabulary expressed in an ontology representation language -->
+  <rdfs:Class rdf:ID="Ontology">
+		<rdfs:subClassOf rdf:resource="#Schema"/>
+	</rdfs:Class>
+	
+	<!-- A collection of controlled vocabulary terms organized into a hierarchical structure-->
+  <rdfs:Class rdf:ID="Taxonomy">
+		<rdfs:subClassOf rdf:resource="#Schema"/>
+	</rdfs:Class>	
+
+	<!-- A networked collection of controlled vocabulary terms -->
+  <rdfs:Class rdf:ID="Thesaurus">
+		<rdfs:subClassOf rdf:resource="#Schema"/>
+	</rdfs:Class>
+		
+  <rdfs:Class rdf:ID="Domain">
+		<rdfs:subClassOf rdf:resource="#Ontology"/>
+	</rdfs:Class>		
+
+  <rdfs:Class rdf:ID="Upper">
+		<rdfs:subClassOf rdf:resource="#Ontology"/>
+	</rdfs:Class>
+	
+  <rdfs:Class rdf:ID="Federated">
+		<rdfs:subClassOf rdf:resource="#Thesaurus"/>
+	</rdfs:Class>
+
+  <rdfs:Class rdf:ID="Faceted">
+		<rdfs:subClassOf rdf:resource="#Thesaurus"/>
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="Networked">
+		<rdfs:subClassOf rdf:resource="#Thesaurus"/>
+	</rdfs:Class>
+	
+	<rdfs:Class rdf:ID="Version"/>
+	
+	<rdfs:Class rdf:ID="Person"/>
+		
+	
+	<!-- !!!!!!!!!!!! Properties !!!!!!!!!!!!!!! -->
+	
+<!-- properties of class Schema -->
+	<rdf:Property rdf:ID="title">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="comment">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="id">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="keywords">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<!-- The syntactic encoding.Three possible values:"RDF/XML","N-TRIPLE","N3"--> 
+	<rdf:Property rdf:ID="encoding">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<!-- Four possible values:"RDF","RDFS","OWL","DAML+OIL"-->
+	<rdf:Property rdf:ID="language">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+	<rdf:Property rdf:ID="numberOfClasses">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>		
+	</rdf:Property>	
+
+	<rdf:Property rdf:ID="numberOfProperties">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="maxHierarchyDepth">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="extends">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Schema"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="extendsClass">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Schema"/>
+		<rdfs:subPropertyOf rdf:resource="extends"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="extendsProperty">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Schema"/>
+		<rdfs:subPropertyOf rdf:resource="extends"/>
+	</rdf:Property>				
+	
+	<rdf:Property rdf:ID="imports">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Schema"/>
+	</rdf:Property>			
+
+	<rdf:Property rdf:ID="creator">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Person"/>
+	</rdf:Property>	
+	
+	<rdf:Property rdf:ID="hasVersion">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Version"/>
+	</rdf:Property>
+<!-- end of properties for class Schema -->	
+
+<!-- properties of class Person-->
+
+	<rdf:Property rdf:ID="firstname">
+		<rdfs:domain rdf:resource="#Person"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="lastname">
+		<rdfs:domain rdf:resource="#Person"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="e_mail">
+		<rdfs:domain rdf:resource="#Person"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+<!-- end of properties for class Person-->						
+
+<!-- properties of class Version -->	
+<!-- title of ontology 
+	<rdf:Property rdf:ID="title">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property> -->	
+
+<!-- Unique identifier for an instance of the class version-->
+	<rdf:Property rdf:ID="versionID">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>	
+	
+<!-- The date the ontology was released-->	
+	<rdf:Property rdf:ID="releaseDate">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+	</rdf:Property>
+	
+<!-- Takes four values:Development,Alpha,Beta,Stable.
+		Stable is the final version-->	
+	<rdf:Property rdf:ID="releaseLevel">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>			
+
+<!-- Takes three values: current,depreciated,obsolete. When a version is depreciated
+		the release level is upgraded.There can be only one current version -->
+	<rdf:Property rdf:ID="status">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+	</rdf:Property>
+
+<!-- Link to the previous version, that has been depreciated because of this instance-->	
+	<rdf:Property rdf:ID="hasPreviousVersion">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="#Version"/>
+	</rdf:Property>
+	
+<!-- Used only for current versions.-->	
+	<rdf:Property rdf:ID="lastModified">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>		
+	</rdf:Property>		
+
+<!-- The date that this version was replaced by a new one-->
+	<rdf:Property rdf:ID="depreciationDate">
+		<rdfs:domain rdf:resource="#Version"/>
+		<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+	</rdf:Property>
+	
+	<rdf:Property rdf:ID="contributor">
+		<rdfs:domain rdf:resource="#Schema"/>
+		<rdfs:range rdf:resource="#Person"/>
+	</rdf:Property>	
+<!-- end of properties for class Version -->	
+		
+
+</rdf:RDF>	
+	

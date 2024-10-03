@@ -1,0 +1,31 @@
+Description
+
+StarLion is a tool (written in Java) for visualizing RDF ontologies. It
+can load ontologies expressed in .rdfs files or stored at the FORTH-ICS
+Semantic Web Knowledge Middleware (for more see
+http://athena.ics.forth.gr:9090/SWKM/).
+Distinctive characteristics of StarLion include:
+(a) the provision of Top-k diagrams  for aiding the process of 
+understanding an ontology,
+(b) configurable force-directed layout algorithms,
+(c) support of a semi-automatic layout process (where the user can change
+node positions, nail down nodes, apply layout algorithms, etc).
+
+StarLion can load more than one namespaces (the dependencies of an
+ontology) and supports multiples frames and visualization views.
+
+Related Publications:
+
+Yannis Tzitzikas, Dimitris Kotzinos and Yannis Theoharis,On Ranking RDF
+Schema Elements (and its Application in Visualization), Journal of
+Universal Computer Science (JUCS), Special Issue: Ontologies and Their
+Applications, Nov 2007
+
+Contact Person
+        Yannis Tzitzikas (www.ics.forth.gr/~tzitzik)
+
+Developers
+        Stergios Leonidis and  Stamatis Zabetakis. The implementation of StarLion
+includes the SWKM Model and the WS Client developed by the rest members
+of the SWTECH group of FORTH-ICS.The library that was used for graph drawing can
+be fount at http://www.jgraph.com/

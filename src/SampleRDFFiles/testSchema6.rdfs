@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<rdf:RDF xml:lang="en"
+	 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+	<rdfs:Class rdf:ID="Class1">
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="Class2">
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass1">
+		<rdfs:subClassOf rdf:resource="#Class1"/>
+        <rdfs:subClassOf rdf:resource="#Class2"/>
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass2">
+        <rdfs:subClassOf rdf:resource="#SubClass1"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass3">
+        <rdfs:subClassOf rdf:resource="#SubClass1"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass4">
+        <rdfs:subClassOf rdf:resource="#SubClass1"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass5">
+        <rdfs:subClassOf rdf:resource="#SubClass1"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass6">
+        <rdfs:subClassOf rdf:resource="#SubClass1"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass7">
+		<rdfs:subClassOf rdf:resource="#SubClass2"/>
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass8">
+		<rdfs:subClassOf rdf:resource="#SubClass2"/>
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass9">
+		<rdfs:subClassOf rdf:resource="#SubClass6"/>
+	</rdfs:Class>
+
+    <rdfs:Class rdf:ID="SubClass10">
+		<rdfs:subClassOf rdf:resource="#SubClass6"/>
+	</rdfs:Class>
+
+</rdf:RDF>

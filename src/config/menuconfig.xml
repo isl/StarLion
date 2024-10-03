@@ -1,0 +1,418 @@
+<menubar>
+	<menu name="Project">
+		<menuitem>
+			<name>New Project</name>
+			<actionCommand>NewProjectAction</actionCommand> 
+			<mnemonic>N</mnemonic>
+			<enabled>true</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn></dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Open Project</name>
+			<actionCommand>OpenProjectAction</actionCommand> 
+			<mnemonic>O</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn></dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Close Current Project</name>
+			<actionCommand>CloseProjectAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project</dependsOn>
+		</menuitem>
+		<separator></separator>
+		<menu name="Project Manager">
+			<menuitem>
+				<name>New Visualization Frame</name>
+				<actionCommand>NewFrameAction</actionCommand> 
+				<mnemonic>T</mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Save Layout of multiple Frames</name>
+				<actionCommand>SaveFramesAction</actionCommand> 
+				<mnemonic>S</mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Save Frame's Graph as Image</name>
+				<actionCommand>GenerateImageFileAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+		</menu>
+		<separator></separator>
+		<menuitem>
+			<name>Exit</name>
+			<actionCommand>ExitAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>true</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn></dependsOn>
+		</menuitem>
+	</menu>
+	<menu name="Node">
+		<menuitem>
+			<name>Nail</name>
+			<actionCommand>NailAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Unail</name>
+			<actionCommand>UnailAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Hide</name>
+			<actionCommand>HideAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Unhide All</name>
+			<actionCommand>UnHideAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+	</menu>
+        <menu name="Edge">
+            <menuitem>
+                <name>Turn Labels On</name>
+                <actionCommand>LabelsOnAction</actionCommand> 
+		<mnemonic></mnemonic>
+		<enabled>false</enabled>
+		<shouldEnable>true</shouldEnable>
+                <dependsOn>project,frame</dependsOn>
+            </menuitem>
+            <menuitem>
+                <name>Turn Labels Off</name>
+                <actionCommand>LabelsOffAction</actionCommand> 
+		<mnemonic></mnemonic>
+		<enabled>false</enabled>
+		<shouldEnable>true</shouldEnable>
+                <dependsOn>project,frame</dependsOn>
+            </menuitem>
+        </menu>
+	<menu name="Edit">
+		<menuitem>
+			<name>Undo</name>
+			<actionCommand>UndoAction</actionCommand> 
+			<mnemonic>U</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Redo</name>
+			<actionCommand>RedoAction</actionCommand> 
+			<mnemonic>R</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Properties</name>
+			<actionCommand>PropertiesAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+                <!-- Debugging menu should removed in the normal execution of the program -->
+                <!--
+                <menuitem>
+			<name>Cache</name>
+			<actionCommand>cacheAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+                -->
+	</menu>
+	<menu name="Select">
+		<menuitem>
+			<name>All Nodes</name>
+			<actionCommand>AllAction</actionCommand> 
+			<mnemonic>A</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Connected to the selected</name>
+			<actionCommand>SelectConnectedAction</actionCommand> 
+			<mnemonic>C</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>All subclasses of selected</name>
+			<actionCommand>SelectAllSubClassAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+                <menuitem>
+			<name>Find</name>
+			<actionCommand>FindAction</actionCommand> 
+			<mnemonic>F</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+	</menu>
+	<menu name="View">
+		<menu name="Select View">
+                        <menuitem>
+				<name>Entire Graph View</name>
+				<actionCommand>GraphViewAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+                        <menu name="Star View">
+                            <menuitem>
+                                <name>Default</name>
+				<actionCommand>StarViewDefaultAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+                            </menuitem>
+                            <menuitem>
+                                <name>Configure</name>
+				<actionCommand>StarViewConfiguredAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+                            </menuitem>
+                        </menu>
+                        <menuitem>
+				<name>List View</name>
+				<actionCommand>ListViewAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Tree View</name>
+				<actionCommand>tree</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Graph View</name>
+				<actionCommand>GraphViewAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Textual View</name>
+				<actionCommand>ViewTextualAction</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Hyperbolic View</name>
+				<actionCommand>hyperbolic</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>false</shouldEnable>
+				<dependsOn>project,frame</dependsOn>
+			</menuitem>
+		</menu>
+		<menu name="Top-K">
+			<menuitem>
+				<name>Graph Degree [Method 0]</name>
+				<actionCommand>Method0Action</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project</dependsOn>
+				</menuitem>
+				<menuitem>
+				<name>Random Surfer Explicit [Method 2]</name>
+				<actionCommand>Method2Action</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project</dependsOn>
+			</menuitem>
+			<menuitem>
+				<name>Random Surfer Inferred [Method 5]</name>
+				<actionCommand>Method5Action</actionCommand> 
+				<mnemonic></mnemonic>
+				<enabled>false</enabled>
+				<shouldEnable>true</shouldEnable>
+				<dependsOn>project</dependsOn>
+			</menuitem>
+		</menu>
+		<menuitem>
+                        <name>Metrics Statistics</name>
+                        <actionCommand>MstatisticsAction</actionCommand> 
+                        <mnemonic></mnemonic>
+                        <enabled>false</enabled>
+                        <shouldEnable>false</shouldEnable>
+                        <dependsOn>project,frame</dependsOn>
+                </menuitem>
+	</menu>
+	<menu name="Layout">
+		<menuitem>
+			<name>Random Placement</name>
+			<actionCommand>RandomAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Barycenter</name>
+			<actionCommand>barycenter</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Repulsion</name>
+			<actionCommand>repulsiont</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>General-Purpose Force-Directed Placement</name>
+			<actionCommand>ForceDirectedAction</actionCommand> 
+			<mnemonic>D</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Sugiyama tree drawing Algorithm</name>
+			<actionCommand>sugiyama</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+	</menu>
+	<menu name="Scaling">
+		<menuitem>
+			<name>Scale Active Graph</name>
+			<actionCommand>ScaleAction</actionCommand> 
+			<mnemonic>Z</mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+                <menuitem>
+			<name>Scale Coordinates of Graph</name>
+			<actionCommand>ScaleCoordinatesAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+                
+	</menu>
+	<menu name="Window">
+		<menuitem>
+			<name>Tile frames</name>
+			<actionCommand>TileAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Cascade frames</name>
+			<actionCommand>CascadeAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+	</menu>
+	<menu name="Rank File">
+		<menuitem>
+			<name>Generate</name>
+			<actionCommand>GenerateRankFileAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project</dependsOn>
+		</menuitem>
+	</menu>
+        <menu name="Help">
+		<menuitem>
+			<name>Help Contents</name>
+			<actionCommand>HelpAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>true</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project</dependsOn>
+		</menuitem>
+                <menuitem>
+			<name>About</name>
+			<actionCommand>AboutAction</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>false</shouldEnable>
+			<dependsOn>project</dependsOn>
+		</menuitem>
+	</menu>
+        <!-- We don't want this menu to appear 
+	<menu name="Horizontal Visualization">
+		<menuitem>
+			<name>Rank by Subclasses only</name>
+			<actionCommand>rank_by_subclasses</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project</dependsOn>
+		</menuitem>
+		<menuitem>
+			<name>Visualize</name>
+			<actionCommand>visualizeHorizontally</actionCommand> 
+			<mnemonic></mnemonic>
+			<enabled>false</enabled>
+			<shouldEnable>true</shouldEnable>
+			<dependsOn>project,frame</dependsOn>
+		</menuitem>
+	</menu>
+        -->
+</menubar>
