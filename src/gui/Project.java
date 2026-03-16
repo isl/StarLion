@@ -7,6 +7,7 @@ import gr.forth.ics.rdfsuite.services.RdfDocument;
 
 import gr.forth.ics.rdfsuite.services.util.IOUtils;
 import gr.forth.ics.rdfsuite.services.util.ModelUtils;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,10 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import java.util.Set;
@@ -26,7 +29,10 @@ import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 
 import javax.swing.JPanel;
+import mapping.GraphBackendMode;
+import mapping.canonical.CanonicalRdfSnapshot;
 import model.RDFModel;
+import service.RDFService;
 
 /**
  * The user can open multiple frames (using multiple graph visualisations if preferred) for the same RDF Model.
@@ -50,6 +56,8 @@ public class Project {
     private Client                   activeClient = null;
 
     private RDFModel model = null;
+    private RDFService rdfService = null;
+    private final LinkedHashSet<String> effectiveNamespaces = new LinkedHashSet<String>();
     
     private ArrayList<InternalFrame> frameList = null;
     // private ArrayList <VisualInformationFrame> VframeList =null;
@@ -76,6 +84,7 @@ public class Project {
         
         frameList = new ArrayList<InternalFrame>();
         model = new RDFModel();
+        rdfService = new RDFService(model);
     }//end Project
 
     /**
@@ -124,6 +133,9 @@ public class Project {
         }catch(gr.forth.ics.rdfsuite.services.exceptions.SwkmModelException skwme){
             removeDocument(docUri);
             throw skwme;
+        }catch(RuntimeException ex){
+            removeDocument(docUri);
+            throw ex;
         }
     }
 
@@ -194,6 +206,7 @@ public class Project {
             //if a document is removed we should update the model
             //To do this we create a new model and populate it
             model = new RDFModel();
+            rdfService = new RDFService(model);
             populateModel();
         }
         if(plainDocs.containsKey(docUri)){
@@ -210,6 +223,7 @@ public class Project {
     public void removeAllDocuments(){
         modelDocs.clear();
         model = new RDFModel();
+        rdfService = new RDFService(model);
         populateModel();
         plainDocs.clear();
         swkmConns.clear();
@@ -323,7 +337,135 @@ public class Project {
      * to reflect the changes
      */
      private void populateModel(){
-         ModelUtils.readAll(model.getModel(),modelDocs.values(),Deps.WITH);
+         model = new RDFModel();
+         rdfService = new RDFService(model);
+         if (requiresJenaMode(modelDocs.values())) {
+             rdfService.setBackendMode(GraphBackendMode.JENA);
+         }
+         effectiveNamespaces.clear();
+
+         for (RdfDocument document : modelDocs.values()) {
+             if (document == null || document.getContent() == null) {
+                 continue;
+             }
+             try {
+                 String format = normalizeFormat(document.getFormat());
+                 String localFilePath = resolveLocalFilePath(document.getURI());
+                 boolean loaded;
+                 if (localFilePath != null) {
+                     // Preserve original file bytes for local docs (important for parser stability on Windows).
+                     loaded = rdfService.read(localFilePath, document.getURI(), format, true);
+                 } else {
+                     InputStream payload = new ByteArrayInputStream(document.getContent().getBytes(StandardCharsets.UTF_8));
+                     loaded = rdfService.read(payload, document.getURI(), format, true);
+                 }
+                 if (!loaded) {
+                     Logger.getLogger(Project.class.getName()).log(
+                             Level.WARNING,
+                             "Failed to load RDF document for namespace extraction: {0}",
+                             document.getURI()
+                     );
+                     logDocumentBackendSummary(document.getURI(), 0);
+                     continue;
+                 }
+                 CanonicalRdfSnapshot snapshot = rdfService.getCanonicalSnapshot();
+                 Collection<String> snapshotNs = snapshot.getNamespaces();
+                 int docNamespaceCount = 0;
+                 if (snapshotNs != null && !snapshotNs.isEmpty()) {
+                     effectiveNamespaces.addAll(snapshotNs);
+                     docNamespaceCount = snapshotNs.size();
+                 } else {
+                     Collection<String> swkmNs = extractSwkmNamespacesForDocument(document, format, localFilePath);
+                     effectiveNamespaces.addAll(swkmNs);
+                     docNamespaceCount = swkmNs.size();
+                 }
+                 logDocumentBackendSummary(document.getURI(), docNamespaceCount);
+             } catch (RuntimeException ex) {
+                 Logger.getLogger(Project.class.getName()).log(
+                         Level.WARNING,
+                         "Namespace extraction failed for document: " + document.getURI(),
+                         ex
+                 );
+             }
+         }
+     }
+
+     private void logDocumentBackendSummary(String documentUri, int namespaceCount) {
+         System.out.println("[DOC BACKEND] file=" + documentUri
+                 + " jena_parsable=" + rdfService.wasLastJenaParsable()
+                 + " effective=" + rdfService.getLastEffectiveBackend()
+                 + " namespaces_count=" + namespaceCount);
+     }
+
+     private String normalizeFormat(Object format) {
+         if (format == null) {
+             return "RDF/XML";
+         }
+         String normalized = String.valueOf(format).trim();
+         if ("RDF_XML".equalsIgnoreCase(normalized) || "RDFXML".equalsIgnoreCase(normalized)) {
+             return "RDF/XML";
+         }
+         return normalized;
+     }
+
+     private boolean requiresJenaMode(Collection<RdfDocument> documents) {
+         for (RdfDocument document : documents) {
+             if (document == null || document.getURI() == null) {
+                 continue;
+             }
+             String uri = document.getURI().toLowerCase();
+             if (uri.contains(".ttl") || uri.contains(".owl")) {
+                 return true;
+             }
+         }
+         return false;
+     }
+
+     private String resolveLocalFilePath(String documentUri) {
+         if (documentUri == null || documentUri.trim().isEmpty()) {
+             return null;
+         }
+         String candidate = documentUri.trim();
+         if (candidate.endsWith("#")) {
+             candidate = candidate.substring(0, candidate.length() - 1);
+         }
+         if (candidate.isEmpty()) {
+             return null;
+         }
+         File file = new File(candidate);
+         if (file.exists() && file.isFile()) {
+             return file.getAbsolutePath();
+         }
+         return null;
+     }
+
+     private Collection<String> extractSwkmNamespacesForDocument(RdfDocument document, String format, String localFilePath) {
+         LinkedHashSet<String> namespaces = new LinkedHashSet<String>();
+         try {
+             RDFModel fallbackModel = new RDFModel();
+             boolean loaded;
+             if (localFilePath != null) {
+                 loaded = fallbackModel.read(localFilePath, document.getURI(), format, true);
+             } else {
+                 InputStream payload = new ByteArrayInputStream(document.getContent().getBytes(StandardCharsets.UTF_8));
+                 loaded = fallbackModel.read(payload, document.getURI(), format, true);
+             }
+             if (!loaded) {
+                 return namespaces;
+             }
+             String[] swkmNs = fallbackModel.getNamespaces();
+             if (swkmNs == null) {
+                 return namespaces;
+             }
+             for (String ns : swkmNs) {
+                 if (ns != null && !ns.trim().isEmpty()) {
+                     namespaces.add(ns);
+                 }
+             }
+         } catch (RuntimeException ignored) {
+             // Keep empty fallback set; caller already has canonical path attempt.
+         }
+         return namespaces;
      }
      
 
@@ -493,6 +635,13 @@ public class Project {
     }//end getModel
 
     /**
+     * Returns all RDF documents currently loaded in this project.
+     */
+    public Collection<RdfDocument> getModelDocuments() {
+        return modelDocs.values();
+    }
+
+    /**
      * Get all txt documents that are loaded in the project as InputStreams
      * 
      * @return a collection of inputStreams(stream of simple txt files)
@@ -529,9 +678,13 @@ public class Project {
         Set<String> plainDocNs = plainDocs.keySet();
         
         ArrayList<String> allNs = new ArrayList<String>();
-        
-        for(String s:modelNs){
-            allNs.add(s);
+
+        if (!effectiveNamespaces.isEmpty()) {
+            allNs.addAll(effectiveNamespaces);
+        } else {
+            for (String s : modelNs) {
+                allNs.add(s);
+            }
         }
         for(String s:plainDocNs){
             allNs.add(s);

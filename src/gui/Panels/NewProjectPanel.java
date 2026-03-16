@@ -244,7 +244,7 @@ public class NewProjectPanel extends javax.swing.JPanel {
 
         jScrollPane1.setViewportView(jList1);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "LOM2.rdf", "Cidoc.rdf", "Cidoc_Digital.rdfs", "TestFile.rdf", "forcesample.rdf", "ontologyRegistry.rdf", "testSchema1.rdfs", "testSchema1a.rdfs", "testSchema1b.rdfs", "testSchema2.rdfs", "testSchema3.rdfs", "testSchema4.rdfs", "testSchema5.rdfs", "testSchema6.rdfs" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "LOM2.rdf", "Cidoc.rdf", "Cidoc_Digital.rdfs", "TestFile.rdf", "forcesample.rdf", "ontologyRegistry.rdf", "testSchema1.rdfs", "testSchema1a.rdfs", "testSchema1b.rdfs", "testSchema2.rdfs", "testSchema3.rdfs", "testSchema4.rdfs", "testSchema5.rdfs", "testSchema6.rdfs", "sample_ttl.ttl", "sample_owl.owl" }));
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -575,6 +575,10 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         fileName = "/SampleRDFFiles/testSchema5.rdfs";
     }else if (fileName.equals("testSchema6.rdfs")){
         fileName = "/SampleRDFFiles/testSchema6.rdfs";
+    }else if (fileName.equals("sample_ttl.ttl")){
+        fileName = "/SampleRDFFiles/sample_ttl.ttl";
+    }else if (fileName.equals("sample_owl.owl")){
+        fileName = "/SampleRDFFiles/sample_owl.owl";
     }
     nProj.addDocument(fileName, Project.LOCATION_TYPE.CLASSPATH, null);
     if (fileName != null) {
@@ -600,15 +604,24 @@ private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         nProj = new Project(null);
     }
     String fileName = jTextField2.getText();
+    File f = new File(fileName);
+    if (!f.exists()) {
+        JOptionPane.showMessageDialog(null, "The file specified doesn't exist", "Alert", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    if (!isSupportedRdfLocalFile(fileName)) {
+        JOptionPane.showMessageDialog(
+                null,
+                "Unsupported local RDF file format.\nSupported: .rdf, .rdfs, .ttl, .owl",
+                "Unsupported File",
+                JOptionPane.ERROR_MESSAGE
+        );
+        return;
+    }
     nProj.addDocument(fileName, Project.LOCATION_TYPE.LOCAL, null);
     if (fileName != null) {
         files.add(fileName);
         jList1.setListData(files.toArray());
-    }
-    File f = new File(fileName);
-    if (!f.exists()) {
-        JOptionPane.showMessageDialog(null, "The file specified doesn't exist", "Alert", JOptionPane.ERROR_MESSAGE);
-
     }
     namespaceList.setListData(nProj.getProjectNamespaces().toArray());
 }//GEN-LAST:event_jButton3ActionPerformed
@@ -834,6 +847,27 @@ private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }//end catch
         return null;
     }//end parseNamespaces
+
+    private boolean isSupportedRdfLocalFile(String path) {
+        return hasExtension(path, "rdf", "rdfs", "ttl", "owl");
+    }
+
+    private boolean hasExtension(String path, String... supportedExtensions) {
+        if (path == null) {
+            return false;
+        }
+        int dot = path.lastIndexOf('.');
+        if (dot < 0 || dot == path.length() - 1) {
+            return false;
+        }
+        String ext = path.substring(dot + 1).toLowerCase();
+        for (String supported : supportedExtensions) {
+            if (supported.equals(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

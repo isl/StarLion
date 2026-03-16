@@ -1,48 +1,187 @@
 # StarLion
-StarLion is a visualiation tool (java application) for RDFS/XML files. It can load ontologies expressed in .rdf/.rdfs files or stored at the FORTH-ICS Semantic Web Knowledge Middleware and present them as graphs to the end user.
 
-## Features
+StarLion is a Java application for visualizing RDF/RDFS ontologies as graphs.
 
-StarLion supports a great variety of intersting features like Top-K diagrams, forece directed layout algorithms, various exploration modes including star-graphs, etc.
+It now supports an incremental backend migration from SWKM to Apache Jena, with runtime modes that let you run legacy behavior, comparison behavior, or Jena-first behavior.
 
-### Force Directed Placement Algorithms (FDPAs)
+## 1) First-Time Setup on a New PC
 
-The Force Directed Placement (FDP) visualization algorithm which is implemented in StarLion tries to achieve an optimal positioning of nodes suitable for the visualization of RDF/S information. The algorithm is based on three types of forces:
+### Prerequisites
 
-* the electrical repulsion between the nodes,
-* the stiffness of the springs and
-* the magnetic field which applies to "subclassof" (ISA) edges.
+- JDK 11 or newer installed up to jdk 17 (`java -version`)
+- Internet access for first dependency download
+- Git (optional, only if cloning)
 
-### Star-Graph Exploration Method
+### Get the project
 
-Star-Graph mode allows the gradual exploration of big ontologies by visualizing only a part of the graph at each time. 
+- Clone the repository or copy the project folder.
+- Open a terminal in the project root (where `gradlew` and `build.gradle` are).
+- Ensure Gradle wrapper files exist, especially:
+  - `gradlew` / `gradlew.bat`
+  - `gradle/wrapper/gradle-wrapper.properties`
+  - `gradle/wrapper/gradle-wrapper.jar`
 
-### Top-K Diagrams
+If `gradle/wrapper/gradle-wrapper.jar` is missing, regenerate wrapper files on a machine with Gradle installed:
 
-StarLion allows the provision of Top-K diagrams for aiding the process of understanding large in size ontologies. Currently it supports three Top-K methods:
+```bash
+gradle wrapper --gradle-version 8.13
+```
 
-* Graph Degree Method
-* Random Surfer Explicit
-* Random Surfer Inferred
+### Verify environment
 
-### List View Mode
+```bash
+# Linux/macOS
+./gradlew --version
+```
 
-With List View mode the user can get an overview of all the classes and properties which exist in the .rdfs file in text representation. There is a also a field for quickly viewing the superclass of a class by clicking on any class and the subproperties of a property by clicking on a any property.
+```bat
+:: Windows
+gradlew.bat --version
+```
 
-### Semi-Automatic Layout Process
+## 2) Build the Project
 
-The procedure of drawing the graph can be done entirely automatic. To match exactly the preferences of the users StarLion supports various options making the procedure semi-automatic. They can change the position of nodes by clicking and moving the mouse around and they can change the default layout parameters of the force directed placement algorithm to achieve different layouts based on their needs. Furthermore StarLion offers options for nailing down nodes (in order not to be moved from the Force Directed Placement Algorithms), selecting and hiding of some others.
+```bash
+# Linux/macOS
+./gradlew clean build
+```
 
-### Multiple Namespaces
+```bat
+:: Windows
+gradlew.bat clean build
+```
 
-Multiple namespace support is one of StarLion's distinctive features. The user is able to load the main ontology and all the correlated ontologies at the same time. The different namespaces are visualized with different colours which the user is able to change according to their preferences.
+If dependencies fail to resolve:
 
-## Publications 
+```bash
+./gradlew build --refresh-dependencies
+```
 
-* Stamatis Zampetakis, Yannis Tzitzikas, Asterios Leonidis, Dimitris Kotzinos, "Star-like auto-configurable layouts of variable radius for visualizing and exploring RDF/S ontologies", Journal of Visual Languages & Computing, Available online since 9 March 2012, ISSN 1045-926X, 10.1016/j.jvlc.2012.01.002.
-* Stamatis Zampetakis, Yannis Tzitzikas, Asterios Leonidis, Dimitris Kotzinos StarLion: Auto-Configurable Layouts for Exploring Ontologies, Procs of the 7th Extended Semantic Web Conference (Demo Track), ESWC'2010, Heraklion, Greece, June 2010
-* Yannis Tzitzikas, Dimitris Kotzinos and Yannis Theoharis,On Ranking RDF Schema Elements (and its Application in Visualization), Journal of Universal Computer Science (JUCS), Special Issue: Ontologies and Their Applications, Nov 2007
+## 3) Run the App (Default Mode)
 
-## Read More
+Default backend mode is `JENA` unless overridden.
 
-More details can be found on the public page of StarLion at https://projects.ics.forth.gr/isl/starlion
+```bash
+# Linux/macOS
+./gradlew run
+```
+
+```bat
+:: Windows
+gradlew.bat run
+```
+
+## 4) Run with Specific Backend Mode
+
+StarLion supports 3 modes via `starlion.backend.mode`.
+
+- `SWKM` -> legacy backend behavior
+- `DUAL` -> runs both and compares SWKM vs Jena outputs (parity-oriented mode) , if swkm breaks on file parsing this breaks too
+- `JENA` -> Jena-first parsing, with SWKM fallback for unsupported inputs (this doesnt break if swkm doesnt work because its for fallback only)
+
+### Linux/macOS
+
+```bash
+./gradlew -Dstarlion.backend.mode=SWKM run
+./gradlew -Dstarlion.backend.mode=DUAL run
+./gradlew -Dstarlion.backend.mode=JENA run
+```
+
+### Windows
+
+```bat
+gradlew.bat -Dstarlion.backend.mode=SWKM run
+gradlew.bat -Dstarlion.backend.mode=DUAL run
+gradlew.bat -Dstarlion.backend.mode=JENA run
+```
+
+## 5) Current Jena Migration Behavior
+
+- In `JENA` mode, StarLion attempts Jena parsing first.
+- If Jena parses successfully, SWKM read is skipped.
+- If Jena cannot parse a file, SWKM fallback is used.
+- `.ttl` and `.owl` are included in the supported project flow.
+
+## 6) How Migration Was Implemented (Adapter + Canonical Layer)
+
+To avoid a risky full rewrite, StarLion uses a canonical mapping contract:
+
+- Canonical DTOs in `src/mapping/canonical`
+  - `CanonicalRdfSnapshot`
+  - `CanonicalGraphSnapshot`
+  - `CanonicalNode`
+  - `CanonicalEdge`
+- Adapters in `src/mapping/adapter`
+  - `JenaCanonicalAdapter`
+  - `SwkmCanonicalAdapter`
+  - `CanonicalNameUtils`
+
+This lets services/controllers consume one stable format, regardless of whether data came from SWKM or Jena.
+
+## 7) Build a Runnable Package
+
+### Option A: Fat JAR
+
+```bash
+# Linux/macOS
+./gradlew fatJar
+```
+
+```bat
+:: Windows
+gradlew.bat fatJar
+```
+
+Run it:
+
+```bash
+java -jar build/libs/StarLion-1.0.0-all.jar
+```
+
+Run fat JAR with a specific backend mode:
+
+```bash
+# Linux/macOS
+java -Dstarlion.backend.mode=SWKM -jar build/libs/StarLion-1.0.0-all.jar
+java -Dstarlion.backend.mode=DUAL -jar build/libs/StarLion-1.0.0-all.jar
+java -Dstarlion.backend.mode=JENA -jar build/libs/StarLion-1.0.0-all.jar
+```
+
+```bat
+:: Windows
+java -Dstarlion.backend.mode=SWKM -jar build\libs\StarLion-1.0.0-all.jar
+java -Dstarlion.backend.mode=DUAL -jar build\libs\StarLion-1.0.0-all.jar
+java -Dstarlion.backend.mode=JENA -jar build\libs\StarLion-1.0.0-all.jar
+```
+
+### Option B: Release Bundle (recommended for sharing)
+
+```bash
+./scripts/package-release.sh
+```
+
+Output:
+
+- `release/starlion-app/bin/run.sh` (Linux/macOS)
+- `release/starlion-app/bin/run-jena.sh` (Linux/macOS, JENA mode)
+- `release/starlion-app/bin/run.bat` (Windows)
+- `release/starlion-app/bin/run-jena.bat` (Windows, JENA mode)
+- `release/starlion-app/lib/StarLion-all.jar`
+
+## 8) Key Features
+
+- RDF/RDFS graph visualization
+- Force-directed layout
+- Top-K exploration modes
+- Namespace-aware visualization
+- Star-graph exploration
+
+## 9) Publications
+
+- Stamatis Zampetakis, Yannis Tzitzikas, Asterios Leonidis, Dimitris Kotzinos, "Star-like auto-configurable layouts of variable radius for visualizing and exploring RDF/S ontologies", Journal of Visual Languages & Computing, 2012.
+- Stamatis Zampetakis, Yannis Tzitzikas, Asterios Leonidis, Dimitris Kotzinos, "StarLion: Auto-Configurable Layouts for Exploring Ontologies", ESWC 2010 (Demo Track).
+- Yannis Tzitzikas, Dimitris Kotzinos, Yannis Theoharis, "On Ranking RDF Schema Elements (and its Application in Visualization)", JUCS, 2007.
+
+## 10) More Information
+
+Project page: https://projects.ics.forth.gr/isl/starlion

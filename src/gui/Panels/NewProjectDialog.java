@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -202,7 +203,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
 
         jScrollPane1.setViewportView(jList1);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "LOM2.rdf", "Cidoc.rdf", "Cidoc_Digital.rdfs", "TestFile.rdf", "forcesample.rdf", "ontologyRegistry.rdf", "testSchema1.rdfs", "testSchema1a.rdfs", "testSchema1b.rdfs", "testSchema2.rdfs", "testSchema3.rdfs", "testSchema4.rdfs", "testSchema5.rdfs", "testSchema6.rdfs" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "LOM2.rdf", "Cidoc.rdf", "Cidoc_Digital.rdfs", "TestFile.rdf", "forcesample.rdf", "ontologyRegistry.rdf", "testSchema1.rdfs", "testSchema1a.rdfs", "testSchema1b.rdfs", "testSchema2.rdfs", "testSchema3.rdfs", "testSchema4.rdfs", "testSchema5.rdfs", "testSchema6.rdfs", "sample_ttl.ttl", "sample_owl.owl" }));
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -623,6 +624,10 @@ public class NewProjectDialog extends javax.swing.JDialog {
             fileName = "/SampleRDFFiles/testSchema5.rdfs";
         }else if (fileName.equals("testSchema6.rdfs")){
             fileName = "/SampleRDFFiles/testSchema6.rdfs";
+        }else if (fileName.equals("sample_ttl.ttl")){
+            fileName = "/SampleRDFFiles/sample_ttl.ttl";
+        }else if (fileName.equals("sample_owl.owl")){
+            fileName = "/SampleRDFFiles/sample_owl.owl";
         }
         nProj.addDocument(fileName, Project.LOCATION_TYPE.CLASSPATH, null);
         if (fileName != null) {
@@ -637,7 +642,11 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new RDFFileFilter());
+        if (txtSelector.isSelected()) {
+            fc.setFileFilter(new FileNameExtensionFilter("TXT files", "txt"));
+        } else {
+            fc.setFileFilter(new RDFFileFilter());
+        }
         int returnVal = fc.showOpenDialog(MainFrame.getSingleton());
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -657,6 +666,15 @@ public class NewProjectDialog extends javax.swing.JDialog {
             return;
         }
         if (rdfselector.isSelected()) {
+            if (!isSupportedRdfLocalFile(fileName)) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Unsupported local RDF file format.\nSupported: .rdf, .rdfs, .ttl, .owl",
+                        "Unsupported File",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
             try {
                 nProj.addDocument(fileName, Project.LOCATION_TYPE.LOCAL, null);
             } catch (gr.forth.ics.rdfsuite.services.exceptions.ParsingException pe) {
@@ -671,6 +689,15 @@ public class NewProjectDialog extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(null, "Runtime Exception: Report the bug to the developers", "Alert", JOptionPane.ERROR_MESSAGE);
             }
         } else if (txtSelector.isSelected()) {
+            if (!isTxtFile(fileName)) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "TXT mode accepts only .txt files.",
+                        "Unsupported File",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
             //TODO:19/7/12 Here in the future we should have an exception handling
             //when we create the TXTModel
             nProj.addDocument(fileName, Project.LOCATION_TYPE.TXT, null);
@@ -914,6 +941,31 @@ public class NewProjectDialog extends javax.swing.JDialog {
         }//end catch
         return null;
     }//end parseNamespaces
+
+    private boolean isSupportedRdfLocalFile(String path) {
+        return hasExtension(path, "rdf", "rdfs", "ttl", "owl");
+    }
+
+    private boolean isTxtFile(String path) {
+        return hasExtension(path, "txt");
+    }
+
+    private boolean hasExtension(String path, String... supportedExtensions) {
+        if (path == null) {
+            return false;
+        }
+        int dot = path.lastIndexOf('.');
+        if (dot < 0 || dot == path.length() - 1) {
+            return false;
+        }
+        String ext = path.substring(dot + 1).toLowerCase();
+        for (String supported : supportedExtensions) {
+            if (supported.equals(ext)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
      public boolean ok(){
         //Retrieve user's layout options
